@@ -40,7 +40,7 @@
 		typeEffect();
 	}
 
-	function stop(cancel) {
+	export function stop(cancel) {
 		if (cancel) {
 			trailArr.pop();
 			for (let char of trailArr) {
@@ -237,11 +237,14 @@
 					element.innerHTML += trailArr.shift();
 				}
 
-				let innerSpan = '';
+				trail.innerHTML = '';
 				for (let t = 0; t < trailArr.length; t++) {
-					innerSpan += `<span style="font-size:${t + 14}px; transition: all 50ms;">${trailArr[t]}</span>`;
+					const child = document.createElement('span');
+					child.innerHTML = trailArr[t];
+					child.style = `animation-name: shrink; animation-duration: ${realSpeed * trailLength * 10}ms; animation-delay: ${realSpeed * trailLength * 10 * (t / trailLength) - realSpeed * trailLength * 10}ms`;
+					console.log(child);
+					trail.append(child);
 				}
-				trail.innerHTML = innerSpan;
 			} else {
 				stop(false);
 			}
@@ -251,7 +254,8 @@
 </script>
 
 <pre style="display:inline" bind:this={element}></pre>
-<pre class="trail" style="padding-right: {parentElementWidth / 5}px  " bind:this={trail}></pre>
+<pre class="trail" style="padding-right: {parentElementWidth / 5}px  " bind:this={trail}><span
+		class="trail-segment"></span></pre>
 
 <style>
 	pre {
@@ -261,20 +265,23 @@
 	}
 
 	.trail {
-		margin-left: -2px;
+		margin-left: 0px;
 	}
 
-	.trail * {
-		transition: all 50ms linear;
-        animation: shrink 50ms linear 10ms 1 forwards;
+	.trail-segment {
+		animation: 0.5s linear shrink;
 	}
 
-    @keyframes shrink{
-        from {
-            transform: scale(2,2);
-        }
-        to{
-            transform: scale(1,1);
-        }
-    }
+	@keyframes -global-shrink {
+		from {
+            opacity: .75;
+			font-weight: 900;
+			color: lime;
+		}
+		to {
+			color: black;
+			font-weight: normal;
+            opacity: 1; 
+		}
+	}
 </style>
