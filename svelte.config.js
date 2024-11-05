@@ -12,7 +12,7 @@ const config = {
 			}
 		),
 		paths: {
-			base: process.argv.includes('dev') ? '' : 'https://joejak.github.io/typeout/'
+			base: process.argv.includes('dev') ? '' : 'https://joejak.github.io/typeout'
 		}
 	}
 };
