@@ -1,110 +1,236 @@
 <script>
 	import Typeout from '$lib/Typeout.svelte';
-	import { onMount } from 'svelte';
 
-	let to;
 	let pause = true;
-	let speed = 50;
-	let cof = false;
-	let content = `ou're pretty close using scrollTop == scrollHeight.
-
-scrollTop refers to the top of the scroll position, which will be scrollHeight - offsetHeight
-
-Your if statement should look like so (don't forget to use triple equals):
-
-if( obj.scrollTop === (obj.scrollHeight - obj.offsetHeight))
-{
-}
-Edit: Corrected my answer, was completely wrong
-
-Share
-Improve this answer
-Follow
-edited Aug 12, 2015 at 20:57
-SomeKittens's user avatar
-SomeKittens
-39.4k1919 gold badges115115 silver badges145145 bronze badges
-answered May 18, 2009 at 3:26
-James Davies's user avatar
-James Davies
-9,76966 gold badges3939 silver badges4444 bronze badges
-6
-That almost works, scrollHeight-offsetHeight isn't exatly the same value as scrollTop, but after trying your code, if I require if that difference is fewer than 5 pixels for it to be the bottom I get the behavior I want. – 
-Bjorn
- CommentedMay 18, 2009 at 4:20
-2
-this is not exact. obj.borderWidth need to be considered – 
-looping
- CommentedOct 22, 2013 at 3:39
-2
-i prefer this answer: stackoverflow.com/questions/5828275/… – 
-Chris
- CommentedFeb 12, 2014 at 10:49
-8
-scrollTop can be non-integral, so this requires some tolerance (say, obj.scrollHeight - obj.offsetHeight - obj.scrollTop < 1) to work in all circumstances. See stackoverflow.com/questions/5828275/… – 
-Chris Martin
- CommentedAug 29, 2015 at 6:13 
-maybe it has something to do with the fixed elements on my layout or something else odd I'm doing but the only time this evaluates to true is when I scroll all the way to the top. This is because document.body.scrollHeight equals document.body.offsetHeight in my instance (Chrome) – 
-Evan de la Cruz
- CommentedSep 29, 2016 at 18:20`;
+	let speed = 90;
+	let randomStutterFactor = 5;
+	let trailLength = 30;
+	let content = `Type in your demo here!`;
+	let cursorChar = '&#x258C;';
+	let charPreview;
+	let autoScroll = true;
 	let typer;
 </script>
 
-<h1>Welcome to your library project</h1>
-<p>Create your package using @sveltejs/package and preview/showcase your work with SvelteKit</p>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<header style="display:flex; flex-direction:column; align-items:center;  margin-bottom: 2em;">
+	<h2><Typeout speed="90" content="Typeout.<i style='color:orange'>sѵeʅte</i>"></Typeout></h2>
+	<div style="">
+		<Typeout
+			autoPlay={false}
+			delay="900"
+			content="A handy, customizable component to create a cool typing effect! Try it out below!"
+		></Typeout>
+	</div>
+</header>
 
-<button
-	on:click={() => {
-		typer.stop();
-	}}>finish</button
->
+<div style="margin-left: 2em; margin-right: 2em;">
+	<div style="display:flex; flex-direction:row; gap: 2em;">
+		<div style="display:flex; flex-direction: column;">
+			<div style="display:flex; justify-content:space-between;">
+				<label for="speed">Speed</label>
+				<input style="width: 50px;" type="numeric" disabled max="100" min="1" bind:value={speed} />
+			</div>
 
-<button
-	on:click={() => {
-		typer.stop(true); 
-	}}>Cancel</button
->
+			<input
+				style="writing-mode: horizontal-rl"
+				type="range"
+				name="speed"
+				id="speed"
+				bind:value={speed}
+				min="1"
+				max="100"
+			/>
 
+			<br />
 
-{#if pause}
-	<button
-		on:click={() => {
-			typer.play();
-			pause = false;
-		}}>Play</button
-	>
-{:else}
-	<button
-		on:click={() => {
-			typer.pause();
-			pause = true;
-		}}>Pause</button
-	>
-{/if}
-<label for="speed">Speed</label>
-<input
-	style="writing-mode: horizontal-rl"
-	type="range"
-	name="speed"
-	id="speed"
-	bind:value={speed}
-	min="1"
-	max="100"
-/>
-<input type="numeric" disabled max="100" min="1" bind:value={speed} />
-<br />
-<textarea type="text" name="" id="" bind:value={content}></textarea>
+			<div style="display:flex; justify-content:space-between; ">
+				<label for="speed">Random Stutter Factor</label>
+				<input
+					style="width: 50px;"
+					type="numeric"
+					disabled
+					max="100"
+					min="1"
+					bind:value={randomStutterFactor}
+				/>
+			</div>
 
-<div style="height: 200px; overflow-y: scroll;">
-<Typeout
-	bind:this={typer}
-	bind:content
-	bind:speed
-    trailLength=10
-	on:complete={() => {
-		pause = true;
-		to = false;
-	}}
-></Typeout>
+			<input
+				style="writing-mode: horizontal-rl"
+				type="range"
+				name="speed"
+				id="speed"
+				bind:value={randomStutterFactor}
+				min="1"
+				max="200"
+			/>
+
+			<br />
+
+			<div style="display:flex; justify-content:space-between; ">
+				<label for="speed">Cursor Trail Length</label>
+				<input
+					style="width: 50px;"
+					type="numeric"
+					disabled
+					max="200"
+					min="1"
+					bind:value={trailLength}
+				/>
+			</div>
+
+			<input
+				style="writing-mode: horizontal-rl"
+				type="range"
+				name="speed"
+				id="speed"
+				bind:value={trailLength}
+				min="1"
+				max="250"
+			/>
+
+			<br />
+
+			<div style="display:flex; flex-direction:column; justify-content:space-between; ">
+				<label for="speed" style="margin-bottom: 6px;">Cursor Character</label>
+				<div style="display:flex; justify-content:space-between">
+					<input style="width: 120px;" type="text" bind:value={cursorChar} />
+					<pre
+						style="text-align: center; flex-grow:1; margin: 0px; padding: 0px; margin-left: 20px; margin-right: 20px; padding: 2px; background-color: grey; color: lime;"
+						bind:this={charPreview}
+						contenteditable
+						bind:innerHTML={cursorChar}></pre>
+				</div>
+			</div>
+
+			<br />
+
+			<div
+				style="display:flex; flex-direction:row; justify-content: space-around; gap: 4px; margin-bottom: 4px; "
+			>
+				<button
+					style="flex-grow:1"
+					on:click={() => {
+						typer.stop();
+					}}>Finish</button
+				>
+
+				<button
+					style="flex-grow: 1"
+					on:click={() => {
+						typer.stop(true);
+					}}>Cancel</button
+				>
+			</div>
+			{#if pause}
+				<button
+					style="background-color: #b3ffb3;"
+					on:click={() => {
+						pause = false;
+						typer.play();
+					}}>Play</button
+				>
+			{:else}
+				<button
+					style="background-color: #f3f3af;"
+					on:click={() => {
+						pause = true;
+						typer.pause();
+					}}>Pause</button
+				>
+			{/if}
+			<button
+				style="margin-top: 4px;"
+				on:click={() => {
+					typer.content = '';
+					typer.clear();
+				}}>Clear</button
+			>
+		</div>
+		<div style="display:flex; flex-direction:column; flex-grow:1">
+			<textarea
+				style="flex-grow: 1; border-radius: 12px; padding: 8px; "
+				type="text"
+				name=""
+				id=""
+				bind:value={content}
+			></textarea>
+		</div>
+	</div>
+
+	<br />
+	<p style="margin: 0px; padding:0px; margin-left:auto; color:grey;">output</p>
+	<div style="height: 200px; overflow-y: scroll; border: solid; border-radius: 12px; padding:8px;">
+		<Typeout
+			bind:this={typer}
+			bind:content
+			bind:speed
+			bind:randomStutterFactor
+			bind:trailLength
+			autoScroll={true}
+			autoPlay={false}
+			on:complete={() => {
+				console.log('complete');
+				pause = true;
+			}}
+		></Typeout>
+	</div>
 </div>
+
+<style>
+	button {
+		border-radius: 4px;
+	}
+
+	::-webkit-scrollbar {
+		width: 12px;
+	}
+
+	::-webkit-scrollbar-track {
+		box-shadow: inset 0 0 10px 10px rgb(212, 212, 212);
+		border: solid 0px;
+		border-top-right-radius: 10px;
+		border-bottom-right-radius: 10px;
+	}
+
+	::-webkit-scrollbar-thumb {
+		box-shadow: inset 0 0 10px 10px rgb(110, 117, 133);
+		border: solid 0px;
+		border-top-right-radius: 8px;
+		border-bottom-right-radius: 8px;
+	}
+
+	::-webkit-scrollbar-track:horizontal {
+		box-shadow: inset 0 0 10px 10px rgb(212, 212, 212);
+		border: solid 0px;
+		border-bottom-left-radius: 10px;
+		border-bottom-right-radius: 10px;
+		border-top-right-radius: 0px;
+	}
+
+	::-webkit-scrollbar-thumb:horizontal {
+		box-shadow: inset 0 0 10px 10px rgb(110, 117, 133);
+		border: solid 0px;
+		border-top-right-radius: 0px;
+		border-bottom-left-radius: 8px;
+		border-bottom-right-radius: 8px;
+	}
+
+	textarea::-webkit-scrollbar-track {
+		box-shadow: inset 0 0 10px 10px rgb(212, 212, 212);
+		border: solid 0px;
+		border-top-right-radius: 10px;
+		border-bottom-right-radius: 0px;
+	}
+
+	textarea::-webkit-scrollbar-thumb {
+		box-shadow: inset 0 0 8px 8px rgb(110, 117, 133);
+		border: solid 0px;
+		border-top-right-radius: 8px;
+		border-bottom-right-radius: 0px;
+	}
+
+	label {
+		margin-right: 1em;
+	}
+</style>
