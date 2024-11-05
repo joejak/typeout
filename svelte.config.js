@@ -12,7 +12,7 @@ const config = {
 			}
 		),
 		paths: {
-			base: process.argv.includes('dev') ? '' : 'typeout'
+			base: process.env.NODE_ENV === 'production' ? '/typeout' : '',
 		}
 	}
 };
